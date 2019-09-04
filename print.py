@@ -1,16 +1,48 @@
 import os
 import keyboard
 import time
-
-#convert RGB to CMYK
+import sys
+import urllib.request
 from PIL import Image
-Image.open('D:/image.jpg').convert('CMYK').save('D:/image-cmyk.jpg')
+from PIL import ImageDraw 
 
-#print image
-os.startfile("D:/image-cmyk.jpg", "print")
+fileurl = sys.argv[1]
+fileurl = fileurl.replace("print:", "")
 
-#sleep
-time.sleep(0.5)
+newfilename = "D:\\image-cmyk-new.jpg"
+currentfilename = "D:\\image-rgb.jpg"
 
-#input enter for print image
-keyboard.press_and_release('enter')
+urllib.request.urlretrieve(fileurl, currentfilename)
+
+# Function for print file
+def print_file(file):
+    os.startfile(file, "print")
+
+# Function for check if image is in RGB color format
+def fileColorMode(file):
+    image = Image.open(file)
+    mode = image.mode
+    print('File details:')
+    print('Color mode: ' + mode)
+    return mode  
+
+# Function for translate RGB image to CMYK image
+def translateImage(currentfilename, newfilename):
+    Image.open(currentfilename).convert('CMYK').save(newfilename)
+
+
+if fileColorMode(currentfilename) != "CMYK":
+    # translate image color to CMYK and print
+    translateImage(currentfilename, newfilename)
+    print ("File successfully converted")
+    fileColorMode(newfilename)
+    print_file(newfilename)
+else:
+    print_file(currentfilename)
+    fileColorMode(currentfilename)
+
+input("Press enter to exit")
+
+# Show translated image color format ( was RGB now CMYK )
+
+
