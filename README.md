@@ -9,3 +9,6 @@ modules :
 pip install keyboard
 
 pip install Pillow
+
+
+Created with &hearts; by Afgan Khalilov & David Sitnikov
