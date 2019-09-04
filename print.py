@@ -1,48 +1,49 @@
 import os
-import keyboard
-import time
 import sys
-import urllib.request
+import loadconfig
 from PIL import Image
-from PIL import ImageDraw 
+from urllib.request import urlretrieve
+from urllib.parse import urlparse
 
-fileurl = sys.argv[1]
-fileurl = fileurl.replace("print:", "")
 
-newfilename = "D:\\image-cmyk-new.jpg"
-currentfilename = "D:\\image-rgb.jpg"
+def get_filename(url_address):
+    filename = urlparse(url_address)
+    return os.path.basename(filename.path)
 
-urllib.request.urlretrieve(fileurl, currentfilename)
 
 # Function for print file
 def print_file(file):
     os.startfile(file, "print")
 
+
 # Function for check if image is in RGB color format
-def fileColorMode(file):
+def file_color_mode(file):
     image = Image.open(file)
     mode = image.mode
-    print('File details:')
-    print('Color mode: ' + mode)
-    return mode  
+    print('File details:%s\nColor mode: %s' % file, mode)
+    return mode
+
 
 # Function for translate RGB image to CMYK image
-def translateImage(currentfilename, newfilename):
-    Image.open(currentfilename).convert('CMYK').save(newfilename)
+def translate_image(image, output_filename):
+    Image.open(image).convert('CMYK').save(output_filename)
 
 
-if fileColorMode(currentfilename) != "CMYK":
+os.chdir(loadconfig.directory)
+url = sys.argv[1].replace(loadconfig.proto, "")
+current_filename = get_filename(url)
+new_filename = "cmyk-%s" % current_filename
+urlretrieve(url, current_filename)
+
+if file_color_mode(current_filename) != "CMYK":
     # translate image color to CMYK and print
-    translateImage(currentfilename, newfilename)
+    translate_image(current_filename, new_filename)
     print ("File successfully converted")
-    fileColorMode(newfilename)
-    print_file(newfilename)
+    file_color_mode(new_filename)
+    print_file(new_filename)
 else:
-    print_file(currentfilename)
-    fileColorMode(currentfilename)
+    print_file(current_filename)
+    file_color_mode(current_filename)
 
 input("Press enter to exit")
-
-# Show translated image color format ( was RGB now CMYK )
-
 
